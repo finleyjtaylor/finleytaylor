@@ -1,0 +1,46 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: #121212;
+}
+
+main {
+  flex: 1; 
+}
+
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer; /* Makes it look clickable */
+}
+
+.center-text {
+  text-align: center;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer {
+  position: fixed;
+  text-align: center;
+  font-size: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+  left: 0;
+  bottom: 0;
+  padding-bottom: 5px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column; /* Stacks the divs vertically */
+  align-items: center;    /* Centers them horizontally */
+  justify-content: center;/* Centers them vertically (requires container height) */
+  min-height: 100vh;      /* Optional: Makes container fill the entire viewport height */
+  gap: 15px;              /* Optional: Adds space between the two divs */
+}
