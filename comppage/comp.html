@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Terminal</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
+            margin: 0;
+        }
+        #terminal {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        #output {
+            white-space: pre-wrap;
+        }
+        .input-line {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+            gap: 8px;
+        }
+        .prompt {
+            color: #8888ff;
+            margin-right: 8px;
+        }
+        #command-input {
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: inherit;
+            font-size: inherit;
+            flex-grow: 1;
+            outline: none;
+        }
+
+
+        /* --- Custom Terminal Formatting Styles --- */
+        .normal { color: #00ff00; margin-top: 5px; }
+        .user-command { color: #00ff00; }
+        .header { color: #00ff00; margin-top: 5px;text-decoration: underline; }
+        .job-title { color: #00ff00; font-weight: bold; margin-top: 5px;  }
+        .bullet { color: #00ff00; padding-left: 15px; margin-top: 5px;}
+        .command { color: #00ff00; padding-left: 10px; margin-top: 5px;  }
+        .error-msg { color: #00ff00; font-style: italic; margin-top : 5px; }
+        .system-msg { color: #8888ff; margin-top: 5px; }
+        .link {color: skyblue; margin-top: 5px}
+    </style>
+</head>
+<body>
+
+<div id="terminal">
+    <div id="output"><div class="normal">Hello! Welcome to The Finley Terminal. Type 'help' for a list of commands.</div></div>
+    <div class="input-line">
+        <span class="prompt">user@system:~$  </span>
+        <input type="text" id="command-input" autofocus autocomplete="off">
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById('command-input');
+    const output = document.getElementById('output');
+
+    // 1. Structured responses using types for visual control
+    const responses = {
+        'help': [
+            { text: 'Available commands:', type: 'header' },
+            { text: '- help: show this menu', type: 'command' },
+            { text: '- whoami: a bit about me', type: 'command' },
+            { text: '- exp: view my CS history and experience', type: 'command' },
+            { text: '- proj: hear about my projects', type: 'command' },
+            { text: '- clear: clear the screen', type: 'command' },
+            { text: '- home: go to my home page', type: 'command' }
+        ],
+        'whoami': [
+            { text: 'Hello 👋 My name is Finley!', type: 'header' },
+            { text: 'Originally from Portland, OR, I hold a B.A. in Computer Science from Oberlin College.', type: 'normal' },
+            { text: `I am currently based out of Chicago, where in addition to looking for work in the technology sector, I am also searching for ways to fuel my creativity. I've found that studying theater and STEM subjects at the same time in college gave me a deep appreciation for finding room for both to enrich my life.`, type: 'normal' },
+            {text: 'I would love to hear from you! Reach me at finleyjotaylor@gmail.com', type: 'normal'}
+        ],
+        'exp': [
+            { text: 'WORK EXPERIENCE', type: 'header' },
+            { text: 'CS150 Grader — Oberlin, OH (Sept 2025 - Dec 2025)', type: 'job-title' },
+            { text: '- Grading student work and providing relevant feedback.', type: 'bullet' },
+            { text: '- Experience with git workflows, commits, and team merging.', type: 'bullet' },
+
+            { text: 'Peer Tutor — Oberlin, OH (Sept 2023 - May 2026)', type: 'job-title' },
+            { text: '- Mentoring CSCI 150 students with in-class labs and core concepts.', type: 'bullet' },
+
+            { text: 'Research Assistant — Oberlin, OH (Feb 2025 - May 2025)', type: 'job-title' },
+            { text: '- Development of a CNN for optical character recognition.', type: 'bullet' },
+            { text: '- Experience with TensorFlow, NumPy, OpenCV, and data processing in Python.', type: 'bullet' },
+
+            { text: 'RELEVANT COURSEWORK', type: 'header' },
+            { text: '- Introduction to Artificial Intelligence, University College Dublin', type: 'bullet' },
+            { text: '- Cloud Computing, University College Dublin', type: 'bullet' },
+            { text: '- Software from Start to Start Over, Oberlin College', type: 'bullet' },
+            { text: '- Programming Abstractions, Oberlin College', type: 'bullet' },
+            { text: '- Intermediate Data Science, Oberlin College', type: 'bullet' },
+            
+            { text: 'I have experience with Python, Rust, JavaScript, R, Racket, and HTML/CSS. I am currently learning SQL!', type: 'normal' },
+            { text: 'I am the most interested in data analyst, frontend design, project manager, and entry-level IT roles.', type: 'normal' },
+        ],
+        'proj': [
+            {text: 'I built every page of my website using a combination of original code, HTML templates, CSS styling, open source code, and AI tools.', type: 'normal'},
+            {text: 'Stay tuned for more projects! 🛠️', type: 'normal'}
+        ]
+    };
+
+
+    // Helper function to safely append cleanly styled elements
+    function appendOutput(text, className = '') {
+        const line = document.createElement('div');
+        if (className) line.className = className;
+        line.textContent = text;
+        output.appendChild(line);
+    }
+
+    // Helper function specifically for raw HTML strings (like the user prompt line)
+    function appendOutputHTML(htmlString) {
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = htmlString;
+        output.appendChild(wrapper);
+    }
+
+    // 2. Listen for the Enter key press
+    input.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            const command = input.value.trim().toLowerCase();
+            
+            // Mirror the command typed by the user directly to the screen
+            const html_string =`<div class="input-line"><span class="prompt">user@system:~$</span> <span class="user-command">${input.value}</span></div>`;
+            appendOutputHTML(html_string)
+
+            // 3. Process the command routing
+            if (command === 'clear') {
+                output.innerHTML = ''; 
+                const html_intro =`<div id="output"><div class="normal">Hello! Welcome to The Finley Terminal. Type 'help' for a list of commands.</div>`;
+                appendOutputHTML(html_intro);
+            } else if (command == 'home'){
+                const html_index =`<a class="link" href="../index.html" target="_blank">Click here to return to home page.</a>`;
+                appendOutputHTML(`Goodbye 👋\n` + html_index)
+            }
+            else if (command === '') {
+                // Do nothing if empty, just clear line
+            } else if (responses[command]) {
+                // Render the pre-programmed structural array lines
+                responses[command].forEach(line => {
+                    appendOutput(line.text, line.type);
+                });
+                // Add an empty space row for padding between prompts
+                appendOutput('', 'normal');
+            } else {
+                // Fallback style for invalid commands
+                appendOutput(`Command not found: ${command}. Type 'help' for options.`, 'error-msg');
+            }
+
+            // Reset field & snap user view downwards
+            input.value = '';
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+    });
+
+    // Keep focus on the input field when clicking anywhere on the screen
+    document.addEventListener('click', () => input.focus());
+</script>
+
+</body>
+</html>
+
+
